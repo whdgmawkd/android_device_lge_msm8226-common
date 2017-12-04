@@ -29,7 +29,7 @@ import init.qcom.usb.rc
 import init.wcnss.rc
 
 on early-init
-    export LD_SHIM_LIBS /system/vendor/lib/libmmqjpeg_codec.so|libboringssl-compat.so
+    export LD_SHIM_LIBS /system/vendor/lib/libmmqjpeg_codec.so|libboringssl-compat.so:/system/lib/libril.so|liblge.so
 
 on init
 
@@ -54,6 +54,16 @@ on post-fs
     chown system system /sys/devices/virtual/input/lge_touch/lpwg_notify
     chmod 664 /sys/devices/virtual/input/lge_touch/dt2w_enable
     chown system system /sys/devices/virtual/input/lge_touch/dt2w_enable
+    chmod 664 /sys/devices/virtual/input/lge_touch/tap_to_wake
+    #Trick for LG AKA
+    chown system system /sys/devices/virtual/input/lge_touch/tap_to_wake
+    chmod 644 /sys/devices/virtual/input/lge_touch/lpwg_test_info
+    chown system system /sys/devices/virtual/input/lge_touch/lpwg_test_info
+    chmod 644 /sys/devices/virtual/input/lge_touch/lpwg_test_ctrl
+    chown system system /sys/devices/virtual/input/lge_touch/lpwg_test_ctrl
+    chmod 664 /sys/devices/virtual/input/lge_touch/touch_wake_up_test
+    chown system system /sys/devices/virtual/input/lge_touch/touch_wake_up_test
+    #end of trick
     chmod 664 /sys/devices/virtual/input/lge_touch/incoming_call
     chown system system /sys/devices/virtual/input/lge_touch/incoming_call
     chmod 664 /sys/devices/virtual/input/lge_touch/lockscreen
@@ -183,18 +193,29 @@ on boot
     mkdir /data/nfc/param 0770 nfc nfc
 
     #BRCM Bluetooth
+    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
     chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/type
     chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/state
     chown bluetooth net_bt_stack /proc/bluetooth/sleep/btwake
     chown bluetooth net_bt_stack /proc/bluetooth/sleep/proto
     chown bluetooth net_bt_stack /proc/bluetooth/sleep/lpm
     chown bluetooth net_bt_stack /proc/bluetooth/sleep/btwrite
+    chown bluetooth bluetooth /sys/module/hci_uart/parameters/ath_lpm
+    chown bluetooth bluetooth /sys/module/hci_uart/parameters/ath_btwrite
+    chown system system /sys/module/sco/parameters/disable_esco
+    chown bluetooth bluetooth /sys/module/hci_smd/parameters/hcismd_set
+    chown system system /sys/module/radio_iris_transport/parameters/fmsmd_set
+    chmod 0660 /sys/module/bluetooth_power/parameters/power
+    chmod 0660 /sys/module/hci_smd/parameters/hcismd_set
+    chmod 0660 /sys/module/radio_iris_transport/parameters/fmsmd_set
     chmod 0660 /sys/class/rfkill/rfkill0/state
     chmod 0660 /proc/bluetooth/sleep/btwake
     chmod 0660 /proc/bluetooth/sleep/proto
     chmod 0660 /proc/bluetooth/sleep/lpm
     chmod 0660 /proc/bluetooth/sleep/btwrite
     chown bluetooth net_bt_stack /dev/ttyHS99
+    chmod 0660 /sys/module/hci_uart/parameters/ath_lpm
+    chmod 0660 /sys/module/hci_uart/parameters/ath_btwrite
     chmod 0660 /dev/ttyHS99
     chown bluetooth net_bt_stack /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
@@ -374,6 +395,11 @@ service rmt_storage /system/bin/rmt_storage
     class core
     user root
 
+service lge-sensor-sh /system/bin/sh /init.zetaw.sensor.sh
+    class main
+    user root
+    oneshot
+
 service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     class late_start
     user bluetooth
@@ -391,7 +417,7 @@ service bt-sap /system/bin/sapd 15
 service qmuxd /system/bin/qmuxd
     class main
     user radio
-    group radio audio bluetooth gps diag qcom_diag
+    group radio audio bluetooth gps diag qcom_diag nfc
 
 service netmgrd /system/bin/netmgrd
     class main

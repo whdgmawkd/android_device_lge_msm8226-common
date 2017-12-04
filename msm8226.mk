@@ -64,6 +64,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/ueventd.qcom.rc:root/ueventd.qcom.rc \
     $(LOCAL_PATH)/rootdir/init.qcom.ril.sh:system/etc/init.qcom.ril.sh
 
+ifneq ($(filter f520,$(TARGET_DEVICE)),)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/init.zetaw.sensor.sh:root/init.zetaw.sensor.sh
+endif
+
 # GPS
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/gps/etc/gps.conf:system/etc/gps.conf \
@@ -71,6 +76,10 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/gps/etc/izat.conf:system/etc/izat.conf \
     $(LOCAL_PATH)/gps/etc/quipc.conf:system/etc/quipc.conf \
     $(LOCAL_PATH)/gps/etc/sap.conf:system/etc/sap.conf
+
+# IRSC
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/etc/sec_config:system/etc/sec_config
 
 # Qcom wlan
 ifeq ($(BOARD_HAS_QCOM_WCNSS),true)
@@ -196,5 +205,6 @@ endif
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
 
+ifneq ($(filter w7 jag3gds jagnm g2m w5 w3ds,$(TARGET_DEVICE)),)
 $(call inherit-product, vendor/lge/msm8226-common/msm8226-common-vendor.mk)
-
+endif
