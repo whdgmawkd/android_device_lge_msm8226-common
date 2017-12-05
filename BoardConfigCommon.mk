@@ -103,7 +103,11 @@ BOARD_HAVE_BLUETOOTH_QCOM := true
 BLUETOOTH_HCI_USE_MCT := true
 
 # FM Radio
-# BOARD_HAVE_QCOM_FM := true
+ifneq ($(filter f520,$(TARGET_DEVICE)),)
+# BORAD_HAVE_QCOM_FM := true
+else
+BOARD_HAVE_QCOM_FM := true
+endif
 TARGET_QCOM_NO_FM_FIRMWARE := true
 endif
 
@@ -143,9 +147,12 @@ TARGET_NO_RPC := true
 
 # Camera
 USE_DEVICE_SPECIFIC_CAMERA := true
+ifneq ($(filter f520,$(TARGET_DEVICE)),)
+# No Need LEGACY CAMERA HAL and RELOCATIONS on LG AKA
+else
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
-
+endif
 # Filesystem,
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
